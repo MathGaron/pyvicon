@@ -1,5 +1,5 @@
 # pyvicon
-Python wrapper over Vicon DataStream SDK
+Python3 wrapper over Vicon DataStream SDK
 
 ## Tested with OS :
 - Ubuntu 16.04 LTS
