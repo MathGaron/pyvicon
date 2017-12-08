@@ -9,23 +9,19 @@ using namespace CPP;
 #ifdef __cplusplus
 extern "C" {
 #endif // __cplusplus
-
     //################
     //Module wrapped functions
     //################
 
-    void destroy_client(PyObject* client)
-    {
+    void destroy_client(PyObject* client){
         delete (Client*)PyCapsule_GetPointer(client, "pyvicon.client");
     }
 
-    static PyObject* new_client(PyObject* self, PyObject* args)
-    {
+    static PyObject* new_client(PyObject* self, PyObject* args){
         return PyCapsule_New(new Client(), "pyvicon.client", destroy_client);
     }
 
-    static PyObject* pyvicon_version(PyObject* self, PyObject* args)
-    {
+    static PyObject* pyvicon_version(PyObject* self, PyObject* args){
         PyObject* capsule;
         if (!PyArg_ParseTuple(args, "O", &capsule)) return NULL;
 
@@ -38,8 +34,7 @@ extern "C" {
     //Connection handling
     //###################
 
-    static PyObject* pyvicon_connect(PyObject* self, PyObject* args)
-    {
+    static PyObject* pyvicon_connect(PyObject* self, PyObject* args){
         PyObject* capsule;
         char* ip;
         if (!PyArg_ParseTuple(args, "Os", &capsule, &ip)) return NULL;
@@ -52,9 +47,7 @@ extern "C" {
         Py_END_ALLOW_THREADS
         return Py_BuildValue("I", out.Result);
     }
-
-    static PyObject* pyvicon_connect_to_multicast(PyObject* self, PyObject* args)
-    {
+    static PyObject* pyvicon_connect_to_multicast(PyObject* self, PyObject* args){
         PyObject* capsule;
         char* ip;
         char* multicast;
@@ -68,9 +61,7 @@ extern "C" {
         Py_END_ALLOW_THREADS
         return Py_BuildValue("I", out.Result);
     }
-
-    static PyObject* pyvicon_disconnect(PyObject* self, PyObject* args)
-    {
+    static PyObject* pyvicon_disconnect(PyObject* self, PyObject* args){
         PyObject* capsule;
         if (!PyArg_ParseTuple(args, "O", &capsule)) return NULL;
         Client* client = (Client*)PyCapsule_GetPointer(capsule, "pyvicon.client");
@@ -79,9 +70,7 @@ extern "C" {
         out = client->Disconnect();
         return Py_BuildValue("I", out.Result);
     }
-
-    static PyObject* pyvicon_isconnected(PyObject* self, PyObject* args)
-    {
+    static PyObject* pyvicon_isconnected(PyObject* self, PyObject* args){
         PyObject* capsule;
         if (!PyArg_ParseTuple(args, "O", &capsule)) return NULL;
 
@@ -91,9 +80,7 @@ extern "C" {
         else
             Py_RETURN_FALSE;
     }
-
-    static PyObject* pyvicon_start_transmitting_multicast(PyObject* self, PyObject* args)
-    {
+    static PyObject* pyvicon_start_transmitting_multicast(PyObject* self, PyObject* args){
         PyObject* capsule;
         char* server_ip;
         char* multicast_ip;
@@ -107,9 +94,7 @@ extern "C" {
         Py_END_ALLOW_THREADS
         return Py_BuildValue("I", out.Result);
     }
-
-    static PyObject* pyvicon_stop_transmitting_multicast(PyObject* self, PyObject* args)
-    {
+    static PyObject* pyvicon_stop_transmitting_multicast(PyObject* self, PyObject* args){
         PyObject* capsule;
         if (!PyArg_ParseTuple(args, "O", &capsule)) return NULL;
         Client* client = (Client*)PyCapsule_GetPointer(capsule, "pyvicon.client");
@@ -126,6 +111,37 @@ extern "C" {
     // Configurations
     //###################
 
+    // Output_EnableSegmentData         EnableSegmentData();
+    // Output_EnableMarkerData          EnableMarkerData();
+    // Output_EnableUnlabeledMarkerData EnableUnlabeledMarkerData();
+    // Output_EnableMarkerRayData       EnableMarkerRayData();
+    // Output_EnableDeviceData          EnableDeviceData();
+    // Output_EnableCentroidData        EnableCentroidData();
+    // Output_EnableGreyscaleData       EnableGreyscaleData();
+    // Output_EnableDebugData           EnableDebugData();
+
+    // Output_DisableSegmentData         DisableSegmentData();
+    // Output_DisableMarkerData          DisableMarkerData();
+    // Output_DisableUnlabeledMarkerData DisableUnlabeledMarkerData();
+    // Output_DisableMarkerRayData       DisableMarkerRayData();
+    // Output_DisableDeviceData          DisableDeviceData();
+    // Output_DisableCentroidData        DisableCentroidData();
+    // Output_DisableGreyscaleData       DisableGreyscaleData();
+    // Output_DisableDebugData           DisableDebugData();
+
+    // Output_IsSegmentDataEnabled         IsSegmentDataEnabled() const;
+    // Output_IsMarkerDataEnabled          IsMarkerDataEnabled() const;
+    // Output_IsUnlabeledMarkerDataEnabled IsUnlabeledMarkerDataEnabled() const;
+    // Output_IsMarkerRayDataEnabled       IsMarkerRayDataEnabled() const;
+    // Output_IsDeviceDataEnabled          IsDeviceDataEnabled() const;
+    // Output_IsCentroidDataEnabled        IsCentroidDataEnabled() const;
+    // Output_IsGreyscaleDataEnabled       IsGreyscaleDataEnabled() const;
+    // Output_IsDebugDataEnabled           IsDebugDataEnabled() const;
+
+    //###################
+    //Data Acquisition
+    //###################
+
     static PyObject* pyvicon_set_buffer_size(PyObject* self, PyObject* args) {
         PyObject* capsule;
         unsigned int size;
@@ -135,16 +151,77 @@ extern "C" {
         client->SetBufferSize(size);
         Py_RETURN_NONE;
     }
+    static PyObject* pyvicon_set_stream_mode(PyObject* self, PyObject* args) {
+        PyObject* capsule;
+        unsigned int stream_mode;
+        if (!PyArg_ParseTuple(args, "OI", &capsule, &stream_mode)) return NULL;
+        Client* client = (Client*)PyCapsule_GetPointer(capsule, "pyvicon.client");
 
-    // Output_SetStreamMode SetStreamMode( const StreamMode::Enum Mode );
+        Output_SetStreamMode out;
+        out = client->SetStreamMode(static_cast<StreamMode::Enum>(stream_mode));
+        return Py_BuildValue("I", out.Result);
+    }
     // Output_SetApexDeviceFeedback SetApexDeviceFeedback( const String& i_rDeviceName, bool i_bOn );
-    // Output_SetAxisMapping SetAxisMapping( const Direction::Enum XAxis, const Direction::Enum YAxis, const Direction::Enum ZAxis );
-    // Output_GetAxisMapping GetAxisMapping() const;
+    static PyObject* pyvicon_set_axis_mapping(PyObject* self, PyObject* args) {
+        PyObject* capsule;
+        unsigned int X;
+        unsigned int Y;
+        unsigned int Z;
+        if (!PyArg_ParseTuple(args, "OIII", &capsule, &X, &Y, &Z)) return NULL;
+        Client* client = (Client*)PyCapsule_GetPointer(capsule, "pyvicon.client");
+
+        Output_SetAxisMapping out;
+        out = client->SetAxisMapping(static_cast<Direction::Enum>(X),
+                                     static_cast<Direction::Enum>(Y),
+                                     static_cast<Direction::Enum>(Z));
+        return Py_BuildValue("I", out.Result);
+    }
+    static PyObject* pyvicon_get_axis_mapping(PyObject* self, PyObject* args) {
+        PyObject* capsule;
+        if (!PyArg_ParseTuple(args, "O", &capsule)) return NULL;
+        Client* client = (Client*)PyCapsule_GetPointer(capsule, "pyvicon.client");
+
+        Output_GetAxisMapping out;
+        out = client->GetAxisMapping();
+        return Py_BuildValue("III", out.XAxis, out.YAxis, out.ZAxis);
+    }
     // Output_GetServerOrientation GetServerOrientation() const;
-    // Output_GetFrame GetFrame();
-    // Output_GetFrameNumber GetFrameNumber() const;
-    // Output_GetTimecode GetTimecode() const;
-    // Output_GetFrameRate GetFrameRate() const;
+    static PyObject* pyvicon_get_frame(PyObject* self, PyObject* args){
+        PyObject* capsule;
+        if (!PyArg_ParseTuple(args, "O", &capsule)) return NULL;
+        Client* client = (Client*)PyCapsule_GetPointer(capsule, "pyvicon.client");
+
+        Output_GetFrame out;
+        out = client->GetFrame();
+        return Py_BuildValue("I", out.Result);
+    }
+    static PyObject* pyvicon_get_frame_number(PyObject* self, PyObject* args){
+        PyObject* capsule;
+        if (!PyArg_ParseTuple(args, "O", &capsule)) return NULL;
+        Client* client = (Client*)PyCapsule_GetPointer(capsule, "pyvicon.client");
+
+        Output_GetFrameNumber out;
+        out = client->GetFrameNumber();
+        return Py_BuildValue("I", out.FrameNumber);
+    }
+    static PyObject* pyvicon_get_time_code(PyObject* self, PyObject* args){
+        PyObject* capsule;
+        if (!PyArg_ParseTuple(args, "O", &capsule)) return NULL;
+        Client* client = (Client*)PyCapsule_GetPointer(capsule, "pyvicon.client");
+
+        Output_GetTimecode out;
+        out = client->GetTimecode();
+        return Py_BuildValue("III", out.Hours, out.Minutes, out.Seconds);
+    }
+    static PyObject* pyvicon_get_frame_rate(PyObject* self, PyObject* args){
+        PyObject* capsule;
+        if (!PyArg_ParseTuple(args, "O", &capsule)) return NULL;
+        Client* client = (Client*)PyCapsule_GetPointer(capsule, "pyvicon.client");
+
+        Output_GetFrameRate out;
+        out = client->GetFrameRate();
+        return Py_BuildValue("d", out.FrameRateHz);
+    }
     // Output_GetLatencySampleCount  GetLatencySampleCount() const;
     // Output_GetLatencySampleName   GetLatencySampleName( const unsigned int LatencySampleIndex ) const;
     // Output_GetLatencySampleValue  GetLatencySampleValue( const String & LatencySampleName ) const;
@@ -153,8 +230,29 @@ extern "C" {
     // Output_GetFrameRateCount  GetFrameRateCount() const;
     // Output_GetFrameRateName   GetFrameRateName( const unsigned int FrameRateIndex ) const;
     // Output_GetFrameRateValue  GetFrameRateValue( const String & FrameRateName ) const;
-    // Output_GetSubjectCount GetSubjectCount() const;
-    // Output_GetSubjectName GetSubjectName( const unsigned int SubjectIndex ) const;
+    static PyObject* pyvicon_get_subject_count(PyObject* self, PyObject* args){
+        PyObject* capsule;
+        if (!PyArg_ParseTuple(args, "O", &capsule)) return NULL;
+        Client* client = (Client*)PyCapsule_GetPointer(capsule, "pyvicon.client");
+
+        Output_GetSubjectCount out;
+        out = client->GetSubjectCount();
+        return Py_BuildValue("I", out.SubjectCount);
+    }
+    static PyObject* pyvicon_get_subject_name(PyObject* self, PyObject* args){
+        PyObject* capsule;
+        unsigned int index;
+        if (!PyArg_ParseTuple(args, "OI", &capsule, &index)) return NULL;
+        Client* client = (Client*)PyCapsule_GetPointer(capsule, "pyvicon.client");
+
+        // Watch out with Vicon's custom string memory management!!!!
+        Output_GetSubjectName out = client->GetSubjectName(index);
+        if(out.Result != Result::Success){
+            Py_RETURN_NONE;
+        }
+        std::string name_str = (std::string)out.SubjectName;
+        return Py_BuildValue("s", name_str.c_str());
+    }
     // Output_GetSubjectRootSegmentName GetSubjectRootSegmentName( const String & SubjectName ) const;
     // Output_GetSegmentCount GetSegmentCount( const String  & SubjectName ) const;
     // Output_GetSegmentName GetSegmentName( const String       & SubjectName, const unsigned int   SegmentIndex ) const;
@@ -176,15 +274,89 @@ extern "C" {
     // Output_GetSegmentLocalRotationMatrix GetSegmentLocalRotationMatrix( const String & SubjectName, const String & SegmentName ) const;
     // Output_GetSegmentLocalRotationQuaternion GetSegmentLocalRotationQuaternion( const String & SubjectName, const String & SegmentName ) const;
     // Output_GetSegmentLocalRotationEulerXYZ GetSegmentLocalRotationEulerXYZ( const String & SubjectName, const String & SegmentName ) const;
-    // Output_GetObjectQuality GetObjectQuality( const String & ObjectName ) const;
-    // Output_GetMarkerCount GetMarkerCount( const String  & SubjectName ) const;
-    // Output_GetMarkerName GetMarkerName( const String & SubjectName, const unsigned int  MarkerIndex ) const;
+    static PyObject* pyvicon_get_object_quality(PyObject* self, PyObject* args){
+        PyObject* capsule;
+        char* name;
+        if (!PyArg_ParseTuple(args, "Os", &capsule, &name)) return NULL;
+        Client* client = (Client*)PyCapsule_GetPointer(capsule, "pyvicon.client");
+
+        Output_GetObjectQuality out;
+        out = client->GetObjectQuality(name);
+        if(out.Result != Result::Success){
+            Py_RETURN_NONE;
+        }
+        return Py_BuildValue("d", out.Quality);
+    }
+    static PyObject* pyvicon_get_marker_count(PyObject* self, PyObject* args){
+        PyObject* capsule;
+        char* name;
+        if (!PyArg_ParseTuple(args, "Os", &capsule, &name)) return NULL;
+        Client* client = (Client*)PyCapsule_GetPointer(capsule, "pyvicon.client");
+
+        Output_GetMarkerCount out;
+        out = client->GetMarkerCount(name);
+        if(out.Result != Result::Success){
+            Py_RETURN_NONE;
+        }
+        return Py_BuildValue("I", out.MarkerCount);
+    }
+    static PyObject* pyvicon_get_marker_name(PyObject* self, PyObject* args){
+        PyObject* capsule;
+        char* name;
+        unsigned int index;
+        if (!PyArg_ParseTuple(args, "OsI", &capsule, &name, &index)) return NULL;
+        Client* client = (Client*)PyCapsule_GetPointer(capsule, "pyvicon.client");
+
+        // Watch out with Vicon's custom string memory management!!!!
+        Output_GetMarkerName out = client->GetMarkerName(name, index);
+        if(out.Result != Result::Success){
+            Py_RETURN_NONE;
+        }
+        std::string name_str = (std::string)out.MarkerName;
+        return Py_BuildValue("s", name_str.c_str());
+    }
     // Output_GetMarkerParentName GetMarkerParentName( const String & SubjectName, const String & MarkerName ) const;
-    // Output_GetMarkerGlobalTranslation GetMarkerGlobalTranslation( const String & SubjectName, const String & MarkerName ) const;
+    static PyObject* pyvicon_get_marker_global_translation(PyObject* self, PyObject* args){
+        PyObject* capsule;
+        char* subject_name;
+        char* marker_name;
+        if (!PyArg_ParseTuple(args, "Oss", &capsule, &subject_name, &marker_name)) return NULL;
+        Client* client = (Client*)PyCapsule_GetPointer(capsule, "pyvicon.client");
+
+        Output_GetMarkerGlobalTranslation out;
+        out = client->GetMarkerGlobalTranslation(subject_name, marker_name);
+        if(out.Result != Result::Success){
+            Py_RETURN_NONE;
+        }
+        return Py_BuildValue("ddd", out.Translation[0], out.Translation[1], out.Translation[2]);
+    }
     // Output_GetMarkerRayContributionCount GetMarkerRayContributionCount( const String & SubjectName, const String & MarkerName ) const;
     // Output_GetMarkerRayContribution GetMarkerRayContribution( const String & SubjectName, const String & MarkerName, unsigned int MarkerRayContributionIndex ) const;
-    // Output_GetUnlabeledMarkerCount GetUnlabeledMarkerCount() const;
-    // Output_GetUnlabeledMarkerGlobalTranslation GetUnlabeledMarkerGlobalTranslation( const unsigned int MarkerIndex ) const;
+    static PyObject* pyvicon_get_unlabeled_marker_count(PyObject* self, PyObject* args){
+        PyObject* capsule;
+        if (!PyArg_ParseTuple(args, "O", &capsule)) return NULL;
+        Client* client = (Client*)PyCapsule_GetPointer(capsule, "pyvicon.client");
+
+        Output_GetUnlabeledMarkerCount out;
+        out = client->GetUnlabeledMarkerCount();
+        if(out.Result != Result::Success){
+            Py_RETURN_NONE;
+        }
+        return Py_BuildValue("I", out.MarkerCount);
+    }
+    static PyObject* pyvicon_get_unlabeled_marker_global_translation(PyObject* self, PyObject* args){
+        PyObject* capsule;
+        unsigned int index;
+        if (!PyArg_ParseTuple(args, "Oss", &capsule, &index)) return NULL;
+        Client* client = (Client*)PyCapsule_GetPointer(capsule, "pyvicon.client");
+
+        Output_GetUnlabeledMarkerGlobalTranslation out;
+        out = client->GetUnlabeledMarkerGlobalTranslation(index);
+        if(out.Result != Result::Success){
+            Py_RETURN_NONE;
+        }
+        return Py_BuildValue("ddd", out.Translation[0], out.Translation[1], out.Translation[2]);
+    }
     // Output_GetLabeledMarkerCount GetLabeledMarkerCount() const;
     // Output_GetLabeledMarkerGlobalTranslation GetLabeledMarkerGlobalTranslation( const unsigned int MarkerIndex ) const;
     // Output_GetDeviceCount GetDeviceCount() const;
@@ -205,8 +377,29 @@ extern "C" {
     // Output_GetEyeTrackerCount GetEyeTrackerCount() const;
     // Output_GetEyeTrackerGlobalPosition GetEyeTrackerGlobalPosition( const unsigned int EyeTrackerIndex ) const;
     // Output_GetEyeTrackerGlobalGazeVector GetEyeTrackerGlobalGazeVector( const unsigned int EyeTrackerIndex ) const;
-    // Output_GetCameraCount GetCameraCount() const;
-    // Output_GetCameraName GetCameraName( unsigned int i_CameraIndex ) const;
+
+    static PyObject* pyvicon_get_camera_count(PyObject* self, PyObject* args) {
+        PyObject* capsule;
+        if (!PyArg_ParseTuple(args, "O", &capsule)) return NULL;
+        Client* client = (Client*)PyCapsule_GetPointer(capsule, "pyvicon.client");
+
+        Output_GetCameraCount out;
+        out = client->GetCameraCount();
+        return Py_BuildValue("I", out.CameraCount);
+    }
+    static PyObject* pyvicon_get_camera_name(PyObject* self, PyObject* args){
+        PyObject* capsule;
+        unsigned int index;
+        if (!PyArg_ParseTuple(args, "OI", &capsule, &index)) return NULL;
+        Client* client = (Client*)PyCapsule_GetPointer(capsule, "pyvicon.client");
+
+        Output_GetCameraName out = client->GetCameraName(index);
+        if(out.Result != Result::Success){
+            Py_RETURN_NONE;
+        }
+        std::string name_str = (std::string)out.CameraName;
+        return Py_BuildValue("s", name_str.c_str());
+    }
     // Output_GetCameraId GetCameraId( const std::string & i_rCameraName ) const;
     // Output_GetCameraUserId GetCameraUserId( const std::string & i_rCameraName ) const;
     // Output_GetCameraType GetCameraType( const std::string & i_rCameraName ) const;
@@ -251,6 +444,23 @@ extern "C" {
          {"pyvicon_start_transmitting_multicast", pyvicon_start_transmitting_multicast, METH_VARARGS, "Start multicast server transmission"},
          {"pyvicon_stop_transmitting_multicast", pyvicon_stop_transmitting_multicast, METH_VARARGS, "Stop multicast server transmission"},
          {"pyvicon_set_buffer_size", pyvicon_set_buffer_size, METH_VARARGS, "Set Frame buffer size"},
+         {"pyvicon_set_stream_mode", pyvicon_set_stream_mode, METH_VARARGS, "Set client stream mode : ServerPush, ClientPull, ClientPullPreFetch"},
+         {"pyvicon_set_axis_mapping", pyvicon_set_axis_mapping, METH_VARARGS, "Remaps the 3D axis"},
+         {"pyvicon_get_axis_mapping", pyvicon_get_axis_mapping, METH_VARARGS, "Get the current Axis mapping"},
+         {"pyvicon_get_frame", pyvicon_get_frame, METH_VARARGS, "Request a new frame to be fetched"},
+         {"pyvicon_get_frame_number", pyvicon_get_frame_number, METH_VARARGS, "return the number of the last frame"},
+         {"pyvicon_get_time_code", pyvicon_get_time_code, METH_VARARGS, "Return the timecode information for the last frame H,M,S"},
+         {"pyvicon_get_frame_rate", pyvicon_get_frame_rate, METH_VARARGS, "Return the Vicon camera system frame rate in Hz at the time of the last frame retrieved"},
+         {"pyvicon_get_subject_count", pyvicon_get_subject_count, METH_VARARGS, "Return the number of subjects in the Datastream"},
+         {"pyvicon_get_subject_name", pyvicon_get_subject_name, METH_VARARGS, "Return the name of the subject"},
+         {"pyvicon_get_object_quality", pyvicon_get_object_quality, METH_VARARGS, "Return the quality score of a specified subject"},
+         {"pyvicon_get_marker_count", pyvicon_get_marker_count, METH_VARARGS, "Return the number of markers for a specified subject"},
+         {"pyvicon_get_marker_name", pyvicon_get_marker_name, METH_VARARGS, "Return the marker name"},
+         {"pyvicon_get_marker_global_translation", pyvicon_get_marker_global_translation, METH_VARARGS, "return marker translation w.r.t global coordinate"},
+         {"pyvicon_get_unlabeled_marker_count", pyvicon_get_unlabeled_marker_count, METH_VARARGS, "Return the number of unlabeled markers"},
+         {"pyvicon_get_unlabeled_marker_global_translation", pyvicon_get_unlabeled_marker_global_translation, METH_VARARGS, "Return the position of unlabeled markers"},
+         {"pyvicon_get_camera_count", pyvicon_get_camera_count, METH_VARARGS, "Get camera count"},
+         {"pyvicon_get_camera_name", pyvicon_get_camera_name, METH_VARARGS, "Get camera name"},
          {NULL, NULL, 0, NULL}
     };
 
