@@ -112,28 +112,109 @@ extern "C" {
     //###################
 
     // Output_EnableSegmentData         EnableSegmentData();
-    // Output_EnableMarkerData          EnableMarkerData();
-    // Output_EnableUnlabeledMarkerData EnableUnlabeledMarkerData();
+    static PyObject* pyvicon_enable_marker_data(PyObject* self, PyObject* args){
+        PyObject* capsule;
+        if (!PyArg_ParseTuple(args, "O", &capsule)) return NULL;
+        Client* client = (Client*)PyCapsule_GetPointer(capsule, "pyvicon.client");
+
+        Output_EnableMarkerData out;
+        out = client->EnableMarkerData();
+        return Py_BuildValue("I", out.Result);
+    }
+    static PyObject* pyvicon_enable_unlabeled_marker_data(PyObject* self, PyObject* args){
+        PyObject* capsule;
+        if (!PyArg_ParseTuple(args, "O", &capsule)) return NULL;
+        Client* client = (Client*)PyCapsule_GetPointer(capsule, "pyvicon.client");
+
+        Output_EnableUnlabeledMarkerData out;
+        out = client->EnableUnlabeledMarkerData();
+        return Py_BuildValue("I", out.Result);
+    }
     // Output_EnableMarkerRayData       EnableMarkerRayData();
-    // Output_EnableDeviceData          EnableDeviceData();
+    static PyObject* pyvicon_enable_device_data(PyObject* self, PyObject* args){
+        PyObject* capsule;
+        if (!PyArg_ParseTuple(args, "O", &capsule)) return NULL;
+        Client* client = (Client*)PyCapsule_GetPointer(capsule, "pyvicon.client");
+
+        Output_EnableDeviceData out;
+        out = client->EnableDeviceData();
+        return Py_BuildValue("I", out.Result);
+    }
     // Output_EnableCentroidData        EnableCentroidData();
     // Output_EnableGreyscaleData       EnableGreyscaleData();
     // Output_EnableDebugData           EnableDebugData();
 
     // Output_DisableSegmentData         DisableSegmentData();
-    // Output_DisableMarkerData          DisableMarkerData();
-    // Output_DisableUnlabeledMarkerData DisableUnlabeledMarkerData();
+    static PyObject* pyvicon_disable_marker_data(PyObject* self, PyObject* args){
+        PyObject* capsule;
+        if (!PyArg_ParseTuple(args, "O", &capsule)) return NULL;
+        Client* client = (Client*)PyCapsule_GetPointer(capsule, "pyvicon.client");
+
+        Output_DisableMarkerData out;
+        out = client->DisableMarkerData();
+        return Py_BuildValue("I", out.Result);
+    }
+    static PyObject* pyvicon_disable_unlabeled_marker_data(PyObject* self, PyObject* args){
+        PyObject* capsule;
+        if (!PyArg_ParseTuple(args, "O", &capsule)) return NULL;
+        Client* client = (Client*)PyCapsule_GetPointer(capsule, "pyvicon.client");
+
+        Output_DisableUnlabeledMarkerData out;
+        out = client->DisableUnlabeledMarkerData();
+        return Py_BuildValue("I", out.Result);
+    }
     // Output_DisableMarkerRayData       DisableMarkerRayData();
-    // Output_DisableDeviceData          DisableDeviceData();
+    static PyObject* pyvicon_disable_device_data(PyObject* self, PyObject* args){
+        PyObject* capsule;
+        if (!PyArg_ParseTuple(args, "O", &capsule)) return NULL;
+        Client* client = (Client*)PyCapsule_GetPointer(capsule, "pyvicon.client");
+
+        Output_DisableDeviceData out;
+        out = client->DisableDeviceData();
+        return Py_BuildValue("I", out.Result);
+    }
     // Output_DisableCentroidData        DisableCentroidData();
     // Output_DisableGreyscaleData       DisableGreyscaleData();
     // Output_DisableDebugData           DisableDebugData();
 
     // Output_IsSegmentDataEnabled         IsSegmentDataEnabled() const;
-    // Output_IsMarkerDataEnabled          IsMarkerDataEnabled() const;
-    // Output_IsUnlabeledMarkerDataEnabled IsUnlabeledMarkerDataEnabled() const;
+    static PyObject* pyvicon_is_marker_data_enabled(PyObject* self, PyObject* args){
+        PyObject* capsule;
+        if (!PyArg_ParseTuple(args, "O", &capsule)) return NULL;
+        Client* client = (Client*)PyCapsule_GetPointer(capsule, "pyvicon.client");
+
+        Output_IsMarkerDataEnabled out;
+        out = client->IsMarkerDataEnabled();
+        if(out.Enabled)
+            Py_RETURN_TRUE;
+        else
+            Py_RETURN_FALSE;
+    }
+    static PyObject* pyvicon_is_unlabeled_marker_data_enabled(PyObject* self, PyObject* args){
+        PyObject* capsule;
+        if (!PyArg_ParseTuple(args, "O", &capsule)) return NULL;
+        Client* client = (Client*)PyCapsule_GetPointer(capsule, "pyvicon.client");
+
+        Output_IsUnlabeledMarkerDataEnabled out;
+        out = client->IsUnlabeledMarkerDataEnabled();
+        if(out.Enabled)
+            Py_RETURN_TRUE;
+        else
+            Py_RETURN_FALSE;
+    }
     // Output_IsMarkerRayDataEnabled       IsMarkerRayDataEnabled() const;
-    // Output_IsDeviceDataEnabled          IsDeviceDataEnabled() const;
+    static PyObject* pyvicon_is_device_data_enabled(PyObject* self, PyObject* args){
+        PyObject* capsule;
+        if (!PyArg_ParseTuple(args, "O", &capsule)) return NULL;
+        Client* client = (Client*)PyCapsule_GetPointer(capsule, "pyvicon.client");
+
+        Output_IsDeviceDataEnabled out;
+        out = client->IsDeviceDataEnabled();
+        if(out.Enabled)
+            Py_RETURN_TRUE;
+        else
+            Py_RETURN_FALSE;
+    }
     // Output_IsCentroidDataEnabled        IsCentroidDataEnabled() const;
     // Output_IsGreyscaleDataEnabled       IsGreyscaleDataEnabled() const;
     // Output_IsDebugDataEnabled           IsDebugDataEnabled() const;
@@ -424,12 +505,12 @@ extern "C" {
 
     #define GETSTATE(m) ((struct module_state*)PyModule_GetState(m))
 
-    static PyObject * error_out(PyObject *m)
-    {
-        struct module_state *st = GETSTATE(m);
-        PyErr_SetString(st->error, "something bad happened");
-        return NULL;
-    }
+    //static PyObject * error_out(PyObject *m)
+    //{
+    //    struct module_state *st = GETSTATE(m);
+    //    PyErr_SetString(st->error, "something bad happened");
+    //    return NULL;
+    //}
 
     //#####################
     // Methods
@@ -443,6 +524,15 @@ extern "C" {
          {"pyvicon_isconnected", pyvicon_isconnected, METH_VARARGS, "Verify if connection is established"},
          {"pyvicon_start_transmitting_multicast", pyvicon_start_transmitting_multicast, METH_VARARGS, "Start multicast server transmission"},
          {"pyvicon_stop_transmitting_multicast", pyvicon_stop_transmitting_multicast, METH_VARARGS, "Stop multicast server transmission"},
+         {"pyvicon_enable_marker_data", pyvicon_enable_marker_data, METH_VARARGS, ""},
+         {"pyvicon_enable_unlabeled_marker_data", pyvicon_enable_unlabeled_marker_data, METH_VARARGS, ""},
+         {"pyvicon_enable_device_data", pyvicon_enable_device_data, METH_VARARGS, ""},
+         {"pyvicon_disable_marker_data", pyvicon_disable_marker_data, METH_VARARGS, ""},
+         {"pyvicon_disable_unlabeled_marker_data", pyvicon_disable_unlabeled_marker_data, METH_VARARGS, ""},
+         {"pyvicon_disable_device_data", pyvicon_disable_device_data, METH_VARARGS, ""},
+         {"pyvicon_is_marker_data_enabled", pyvicon_is_marker_data_enabled, METH_VARARGS, ""},
+         {"pyvicon_is_unlabeled_marker_data_enabled", pyvicon_is_unlabeled_marker_data_enabled, METH_VARARGS, ""},
+         {"pyvicon_is_device_data_enabled", pyvicon_is_device_data_enabled, METH_VARARGS, ""},
          {"pyvicon_set_buffer_size", pyvicon_set_buffer_size, METH_VARARGS, "Set Frame buffer size"},
          {"pyvicon_set_stream_mode", pyvicon_set_stream_mode, METH_VARARGS, "Set client stream mode : ServerPush, ClientPull, ClientPullPreFetch"},
          {"pyvicon_set_axis_mapping", pyvicon_set_axis_mapping, METH_VARARGS, "Remaps the 3D axis"},
@@ -495,7 +585,6 @@ extern "C" {
     // Module init function
     //########################
     PyMODINIT_FUNC PyInit_pyvicon_module(void) {
-        PyObject* m;
         PyObject *module = PyModule_Create(&moduledef);
 
         if (module == NULL)

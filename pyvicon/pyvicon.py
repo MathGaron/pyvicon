@@ -67,6 +67,33 @@ class PyVicon:
     def stop_server_multicast(self):
         return Result(pyvicon_module.pyvicon_stop_transmitting_multicast(self.client_))
 
+    def enable_marker_data(self):
+        return Result(pyvicon_module.pyvicon_enable_marker_data(self.client_))
+
+    def enable_unlabeled_marker_data(self):
+        return Result(pyvicon_module.pyvicon_enable_unlabeled_marker_data(self.client_))
+
+    def enable_device_data(self):
+        return Result(pyvicon_module.pyvicon_enable_device_data(self.client_))
+
+    def disable_marker_data(self):
+        return Result(pyvicon_module.pyvicon_disable_marker_data(self.client_))
+
+    def disable_unlabeled_marker_data(self):
+        return Result(pyvicon_module.pyvicon_disable_unlabeled_marker_data(self.client_))
+
+    def disable_device_data(self):
+        return Result(pyvicon_module.pyvicon_disable_device_data(self.client_))
+
+    def is_marker_data_enabled(self):
+        return pyvicon_module.pyvicon_is_marker_data_enabled(self.client_)
+
+    def is_unlabeled_marker_data_enabled(self):
+        return pyvicon_module.pyvicon_is_unlabeled_marker_data_enabled(self.client_)
+
+    def is_device_data_enabled(self):
+        return pyvicon_module.pyvicon_is_device_data_enabled(self.client_)
+
     def set_buffer_size(self, size):
         pyvicon_module.pyvicon_set_buffer_size(self.client_, size)
 
