@@ -13,8 +13,8 @@ as much as possible.
 Download Vicon Datastream SDK [here](https://www.vicon.com/downloads/utilities-and-sdk/datastream-sdk).
 
 Put the .cpp and .h in pyvicon folder.
+Put the library (.so) somewhere accessible for your os (ex: /usr/local/lib).
 
-Make sure  that the libraries can be accessed during runtime.
 ### Install
 ```
 sudo python3 setup.py install
