@@ -1,6 +1,7 @@
 import pyvicon_module
 
 from enum import Enum
+import numpy as np
 
 
 class Result(Enum):
@@ -67,6 +68,9 @@ class PyVicon:
     def stop_server_multicast(self):
         return Result(pyvicon_module.pyvicon_stop_transmitting_multicast(self.client_))
 
+    def enable_segment_data(self):
+        return Result(pyvicon_module.pyvicon_enable_segment_data(self.client_))
+
     def enable_marker_data(self):
         return Result(pyvicon_module.pyvicon_enable_marker_data(self.client_))
 
@@ -75,6 +79,9 @@ class PyVicon:
 
     def enable_device_data(self):
         return Result(pyvicon_module.pyvicon_enable_device_data(self.client_))
+
+    def disable_segment_data(self):
+        return Result(pyvicon_module.pyvicon_disable_segment_data(self.client_))
 
     def disable_marker_data(self):
         return Result(pyvicon_module.pyvicon_disable_marker_data(self.client_))
@@ -132,6 +139,21 @@ class PyVicon:
 
     def get_subject_name(self, index):
         return pyvicon_module.pyvicon_get_subject_name(self.client_, index)
+
+    def get_subject_root_segment_name(self, name):
+        return pyvicon_module.pyvicon_get_subject_root_segment_name(self.client_, name)
+
+    def get_segment_global_translation(self, subject_name, segment_name):
+        T = pyvicon_module.pyvicon_get_segment_global_translation(self.client_, subject_name, segment_name)
+        if T is None:
+            return None
+        return np.array(T)
+
+    def get_segment_global_rotation_matrix(self, subject_name, segment_name):
+        matrix = pyvicon_module.pyvicon_get_segment_global_rotation_matrix(self.client_, subject_name, segment_name)
+        if matrix is None:
+            return None
+        return np.array(matrix).reshape((3, 3))
 
     def get_subject_quality(self, name):
         return pyvicon_module.pyvicon_get_object_quality(self.client_, name)

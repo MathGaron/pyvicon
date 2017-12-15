@@ -111,7 +111,15 @@ extern "C" {
     // Configurations
     //###################
 
-    // Output_EnableSegmentData         EnableSegmentData();
+    static PyObject* pyvicon_enable_segment_data(PyObject* self, PyObject* args){
+        PyObject* capsule;
+        if (!PyArg_ParseTuple(args, "O", &capsule)) return NULL;
+        Client* client = (Client*)PyCapsule_GetPointer(capsule, "pyvicon.client");
+
+        Output_EnableSegmentData out;
+        out = client->EnableSegmentData();
+        return Py_BuildValue("I", out.Result);
+    }
     static PyObject* pyvicon_enable_marker_data(PyObject* self, PyObject* args){
         PyObject* capsule;
         if (!PyArg_ParseTuple(args, "O", &capsule)) return NULL;
@@ -144,7 +152,15 @@ extern "C" {
     // Output_EnableGreyscaleData       EnableGreyscaleData();
     // Output_EnableDebugData           EnableDebugData();
 
-    // Output_DisableSegmentData         DisableSegmentData();
+    static PyObject* pyvicon_disable_segment_data(PyObject* self, PyObject* args){
+        PyObject* capsule;
+        if (!PyArg_ParseTuple(args, "O", &capsule)) return NULL;
+        Client* client = (Client*)PyCapsule_GetPointer(capsule, "pyvicon.client");
+
+        Output_DisableSegmentData out;
+        out = client->DisableSegmentData();
+        return Py_BuildValue("I", out.Result);
+    }
     static PyObject* pyvicon_disable_marker_data(PyObject* self, PyObject* args){
         PyObject* capsule;
         if (!PyArg_ParseTuple(args, "O", &capsule)) return NULL;
@@ -334,7 +350,20 @@ extern "C" {
         std::string name_str = (std::string)out.SubjectName;
         return Py_BuildValue("s", name_str.c_str());
     }
-    // Output_GetSubjectRootSegmentName GetSubjectRootSegmentName( const String & SubjectName ) const;
+    static PyObject* pyvicon_get_subject_root_segment_name(PyObject* self, PyObject* args){
+        PyObject* capsule;
+        char* name;
+        if (!PyArg_ParseTuple(args, "Os", &capsule, &name)) return NULL;
+        Client* client = (Client*)PyCapsule_GetPointer(capsule, "pyvicon.client");
+
+        // Watch out with Vicon's custom string memory management!!!!
+        Output_GetSubjectRootSegmentName out = client->GetSubjectRootSegmentName(name);
+        if(out.Result != Result::Success){
+            Py_RETURN_NONE;
+        }
+        std::string name_str = (std::string)out.SegmentName;
+        return Py_BuildValue("s", name_str.c_str());
+    }
     // Output_GetSegmentCount GetSegmentCount( const String  & SubjectName ) const;
     // Output_GetSegmentName GetSegmentName( const String       & SubjectName, const unsigned int   SegmentIndex ) const;
     // Output_GetSegmentChildCount GetSegmentChildCount( const String & SubjectName, const String & SegmentName ) const;
@@ -345,9 +374,37 @@ extern "C" {
     // Output_GetSegmentStaticRotationMatrix GetSegmentStaticRotationMatrix( const String & SubjectName, const String & SegmentName ) const;
     // Output_GetSegmentStaticRotationQuaternion GetSegmentStaticRotationQuaternion( const String & SubjectName, const String & SegmentName ) const;
     // Output_GetSegmentStaticRotationEulerXYZ GetSegmentStaticRotationEulerXYZ( const String & SubjectName, const String & SegmentName ) const;
-    // Output_GetSegmentGlobalTranslation GetSegmentGlobalTranslation( const String & SubjectName, const String & SegmentName ) const;
+    static PyObject* pyvicon_get_segment_global_translation(PyObject* self, PyObject* args){
+        PyObject* capsule;
+        char* subject_name;
+        char* segment_name;
+        if (!PyArg_ParseTuple(args, "Oss", &capsule, &subject_name, &segment_name)) return NULL;
+        Client* client = (Client*)PyCapsule_GetPointer(capsule, "pyvicon.client");
+
+        // Watch out with Vicon's custom string memory management!!!!
+        Output_GetSegmentGlobalTranslation out = client->GetSegmentGlobalTranslation(subject_name, segment_name);
+        if(out.Result != Result::Success || out.Occluded){
+            Py_RETURN_NONE;
+        }
+        return Py_BuildValue("ddd", out.Translation[0], out.Translation[1], out.Translation[2]);
+    }
     // Output_GetSegmentGlobalRotationHelical GetSegmentGlobalRotationHelical( const String & SubjectName, const String & SegmentName ) const;
-    // Output_GetSegmentGlobalRotationMatrix GetSegmentGlobalRotationMatrix( const String & SubjectName, const String & SegmentName ) const;
+    static PyObject* pyvicon_get_segment_global_rotation_matrix(PyObject* self, PyObject* args){
+        PyObject* capsule;
+        char* subject_name;
+        char* segment_name;
+        if (!PyArg_ParseTuple(args, "Oss", &capsule, &subject_name, &segment_name)) return NULL;
+        Client* client = (Client*)PyCapsule_GetPointer(capsule, "pyvicon.client");
+
+        // Watch out with Vicon's custom string memory management!!!!
+        Output_GetSegmentGlobalRotationMatrix out = client->GetSegmentGlobalRotationMatrix(subject_name, segment_name);
+        if(out.Result != Result::Success || out.Occluded){
+            Py_RETURN_NONE;
+        }
+        return Py_BuildValue("ddddddddd", out.Rotation[0], out.Rotation[1], out.Rotation[2],
+                                          out.Rotation[3], out.Rotation[4], out.Rotation[5],
+                                          out.Rotation[6], out.Rotation[7], out.Rotation[8]);
+    }
     // Output_GetSegmentGlobalRotationQuaternion GetSegmentGlobalRotationQuaternion( const String & SubjectName, const String & SegmentName ) const;
     // Output_GetSegmentGlobalRotationEulerXYZ GetSegmentGlobalRotationEulerXYZ( const String & SubjectName, const String & SegmentName ) const;
     // Output_GetSegmentLocalTranslation GetSegmentLocalTranslation( const String & SubjectName, const String & SegmentName ) const;
@@ -524,9 +581,11 @@ extern "C" {
          {"pyvicon_isconnected", pyvicon_isconnected, METH_VARARGS, "Verify if connection is established"},
          {"pyvicon_start_transmitting_multicast", pyvicon_start_transmitting_multicast, METH_VARARGS, "Start multicast server transmission"},
          {"pyvicon_stop_transmitting_multicast", pyvicon_stop_transmitting_multicast, METH_VARARGS, "Stop multicast server transmission"},
+         {"pyvicon_enable_segment_data", pyvicon_enable_segment_data, METH_VARARGS, ""},
          {"pyvicon_enable_marker_data", pyvicon_enable_marker_data, METH_VARARGS, ""},
          {"pyvicon_enable_unlabeled_marker_data", pyvicon_enable_unlabeled_marker_data, METH_VARARGS, ""},
          {"pyvicon_enable_device_data", pyvicon_enable_device_data, METH_VARARGS, ""},
+         {"pyvicon_disable_segment_data", pyvicon_disable_segment_data, METH_VARARGS, ""},
          {"pyvicon_disable_marker_data", pyvicon_disable_marker_data, METH_VARARGS, ""},
          {"pyvicon_disable_unlabeled_marker_data", pyvicon_disable_unlabeled_marker_data, METH_VARARGS, ""},
          {"pyvicon_disable_device_data", pyvicon_disable_device_data, METH_VARARGS, ""},
@@ -543,6 +602,9 @@ extern "C" {
          {"pyvicon_get_frame_rate", pyvicon_get_frame_rate, METH_VARARGS, "Return the Vicon camera system frame rate in Hz at the time of the last frame retrieved"},
          {"pyvicon_get_subject_count", pyvicon_get_subject_count, METH_VARARGS, "Return the number of subjects in the Datastream"},
          {"pyvicon_get_subject_name", pyvicon_get_subject_name, METH_VARARGS, "Return the name of the subject"},
+         {"pyvicon_get_subject_root_segment_name", pyvicon_get_subject_root_segment_name, METH_VARARGS, "Return root segment name"},
+         {"pyvicon_get_segment_global_translation", pyvicon_get_segment_global_translation, METH_VARARGS, "Return segment global translation"},
+         {"pyvicon_get_segment_global_rotation_matrix", pyvicon_get_segment_global_rotation_matrix, METH_VARARGS, "Return segment global rotation matrix"},
          {"pyvicon_get_object_quality", pyvicon_get_object_quality, METH_VARARGS, "Return the quality score of a specified subject"},
          {"pyvicon_get_marker_count", pyvicon_get_marker_count, METH_VARARGS, "Return the number of markers for a specified subject"},
          {"pyvicon_get_marker_name", pyvicon_get_marker_name, METH_VARARGS, "Return the marker name"},
