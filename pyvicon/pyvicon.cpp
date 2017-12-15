@@ -485,7 +485,7 @@ extern "C" {
     static PyObject* pyvicon_get_unlabeled_marker_global_translation(PyObject* self, PyObject* args){
         PyObject* capsule;
         unsigned int index;
-        if (!PyArg_ParseTuple(args, "Oss", &capsule, &index)) return NULL;
+        if (!PyArg_ParseTuple(args, "OI", &capsule, &index)) return NULL;
         Client* client = (Client*)PyCapsule_GetPointer(capsule, "pyvicon.client");
 
         Output_GetUnlabeledMarkerGlobalTranslation out;
