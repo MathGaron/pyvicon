@@ -44,6 +44,14 @@ class Direction(Enum):
     Backward = 5
 
 
+class TimecodeStandard(Enum):
+    NONE = 0
+    PAL = 1
+    NTSC = 2
+    NTSCDrop= 3
+    Film = 4
+
+
 class PyVicon:
     def __init__(self):
         self.client_ = pyvicon_module.new_client()
@@ -129,10 +137,14 @@ class PyVicon:
         return pyvicon_module.pyvicon_get_frame_number(self.client_)
 
     def get_time_code(self):
-        return pyvicon_module.pyvicon_get_time_code(self.client_)
+        result, standard, hours, minutes, seconds = pyvicon_module.pyvicon_get_time_code(self.client_)
+        return Result(result), TimecodeStandard(standard), hours, minutes, seconds
 
     def get_frame_rate(self):
         return pyvicon_module.pyvicon_get_frame_rate(self.client_)
+
+    def get_latency_total(self):
+        return pyvicon_module.pyvicon_get_latency_total(self.client_)
 
     def get_subject_count(self):
         return pyvicon_module.pyvicon_get_subject_count(self.client_)

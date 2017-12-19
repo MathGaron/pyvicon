@@ -308,7 +308,7 @@ extern "C" {
 
         Output_GetTimecode out;
         out = client->GetTimecode();
-        return Py_BuildValue("III", out.Hours, out.Minutes, out.Seconds);
+        return Py_BuildValue("IIIII",out.Result, out.Standard, out.Hours, out.Minutes, out.Seconds);
     }
     static PyObject* pyvicon_get_frame_rate(PyObject* self, PyObject* args){
         PyObject* capsule;
@@ -322,7 +322,15 @@ extern "C" {
     // Output_GetLatencySampleCount  GetLatencySampleCount() const;
     // Output_GetLatencySampleName   GetLatencySampleName( const unsigned int LatencySampleIndex ) const;
     // Output_GetLatencySampleValue  GetLatencySampleValue( const String & LatencySampleName ) const;
-    // Output_GetLatencyTotal        GetLatencyTotal() const;
+    static PyObject* pyvicon_get_latency_total(PyObject* self, PyObject* args){
+        PyObject* capsule;
+        if (!PyArg_ParseTuple(args, "O", &capsule)) return NULL;
+        Client* client = (Client*)PyCapsule_GetPointer(capsule, "pyvicon.client");
+
+        Output_GetLatencyTotal out;
+        out = client->GetLatencyTotal();
+        return Py_BuildValue("d", out.Total);
+    }
     // Output_GetHardwareFrameNumber GetHardwareFrameNumber() const;
     // Output_GetFrameRateCount  GetFrameRateCount() const;
     // Output_GetFrameRateName   GetFrameRateName( const unsigned int FrameRateIndex ) const;
@@ -600,6 +608,7 @@ extern "C" {
          {"pyvicon_get_frame_number", pyvicon_get_frame_number, METH_VARARGS, "return the number of the last frame"},
          {"pyvicon_get_time_code", pyvicon_get_time_code, METH_VARARGS, "Return the timecode information for the last frame H,M,S"},
          {"pyvicon_get_frame_rate", pyvicon_get_frame_rate, METH_VARARGS, "Return the Vicon camera system frame rate in Hz at the time of the last frame retrieved"},
+         {"pyvicon_get_latency_total", pyvicon_get_latency_total, METH_VARARGS, "Return total latency in the system"},
          {"pyvicon_get_subject_count", pyvicon_get_subject_count, METH_VARARGS, "Return the number of subjects in the Datastream"},
          {"pyvicon_get_subject_name", pyvicon_get_subject_name, METH_VARARGS, "Return the name of the subject"},
          {"pyvicon_get_subject_root_segment_name", pyvicon_get_subject_root_segment_name, METH_VARARGS, "Return root segment name"},
