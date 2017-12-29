@@ -1,5 +1,3 @@
-**Under development**
-
 # pyvicon
 This is a minimal python3 wrapper over Vicon Datastream SDK. It keeps the SDK structure and naming convention
 as much as possible.
@@ -20,7 +18,10 @@ Put the library (.so) somewhere accessible for your os (ex: /usr/local/lib).
 sudo python3 setup.py install
 ```
 
+### TODO
+- Implement less "popular" functions
+
 ### Contribution
-Always welcomed!
+Always welcome!
 
 
