@@ -169,7 +169,7 @@ class PyVicon:
 
     def get_segment_global_quaternion(self, subject_name, segment_name):
         quaternion = pyvicon_module.pyvicon_get_segment_global_quaternion(self.client_, subject_name, segment_name)
-        if matrix is None:
+        if quaternion is None:
             return None
         return np.array(quaternion)
 
