@@ -1,5 +1,5 @@
 # pyvicon
-This is a minimal python3 wrapper over Vicon Datastream SDK. It keeps the SDK structure and naming convention
+Minimal python 3 wrapper over Vicon Datastream SDK. It keeps the SDK structure and naming convention
 as much as possible.
 
 ### Tested with OS :
