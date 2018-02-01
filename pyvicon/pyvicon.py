@@ -168,6 +168,12 @@ class PyVicon:
         return np.array(matrix).reshape((3, 3))
 
     def get_segment_global_quaternion(self, subject_name, segment_name):
+        """
+        Return the quaternion as : w,x,y,z
+        :param subject_name:
+        :param segment_name:
+        :return:
+        """
         quaternion = pyvicon_module.pyvicon_get_segment_global_quaternion(self.client_, subject_name, segment_name)
         if quaternion is None:
             return None
@@ -183,11 +189,10 @@ class PyVicon:
         return pyvicon_module.pyvicon_get_marker_name(self.client_, name, index)
 
     def get_marker_global_translation(self, subject_name, marker_name):
-        """
-        if the value is [0, 0, 0] it means that the marker is occluded in this frame (We keep it like that as it is nearly
-            impossible to have a prefect match with the origin.
-        """
-        return pyvicon_module.pyvicon_get_marker_global_translation(self.client_, subject_name, marker_name)
+        pose = pyvicon_module.pyvicon_get_marker_global_translation(self.client_, subject_name, marker_name)
+        if pose is None:
+            return None
+        return np.array(pose)
 
     def get_unlabeled_marker_count(self):
         return pyvicon_module.pyvicon_get_unlabeled_marker_count(self.client_)

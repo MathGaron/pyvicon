@@ -425,7 +425,7 @@ extern "C" {
         if(out.Result != Result::Success || out.Occluded){
             Py_RETURN_NONE;
         }
-        return Py_BuildValue("dddd", out.Rotation[0], out.Rotation[1], out.Rotation[2], out.Rotation[3]);
+        return Py_BuildValue("dddd", out.Rotation[3], out.Rotation[0], out.Rotation[1], out.Rotation[2]);
     }
 
     // Output_GetSegmentGlobalRotationEulerXYZ GetSegmentGlobalRotationEulerXYZ( const String & SubjectName, const String & SegmentName ) const;
@@ -486,6 +486,9 @@ extern "C" {
         Output_GetMarkerGlobalTranslation out;
         out = client->GetMarkerGlobalTranslation(subject_name, marker_name);
         if(out.Result != Result::Success){
+            Py_RETURN_NONE;
+        }
+        if(out.Occluded){
             Py_RETURN_NONE;
         }
         return Py_BuildValue("ddd", out.Translation[0], out.Translation[1], out.Translation[2]);
