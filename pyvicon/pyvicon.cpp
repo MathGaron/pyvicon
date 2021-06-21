@@ -413,20 +413,6 @@ extern "C" {
                                           out.Rotation[3], out.Rotation[4], out.Rotation[5],
                                           out.Rotation[6], out.Rotation[7], out.Rotation[8]);
     }
-    static PyObject* pyvicon_get_segment_global_quaternion(PyObject* self, PyObject* args){
-        PyObject* capsule;
-        char* subject_name;
-        char* segment_name;
-        if (!PyArg_ParseTuple(args, "Oss", &capsule, &subject_name, &segment_name)) return NULL;
-        Client* client = (Client*)PyCapsule_GetPointer(capsule, "pyvicon.client");
-
-        // Watch out with Vicon's custom string memory management!!!!
-        Output_GetSegmentGlobalRotationQuaternion out = client->GetSegmentGlobalRotationQuaternion(subject_name, segment_name);
-        if(out.Result != Result::Success || out.Occluded){
-            Py_RETURN_NONE;
-        }
-        return Py_BuildValue("dddd", out.Rotation[3], out.Rotation[0], out.Rotation[1], out.Rotation[2]);
-    }
 
     static PyObject* pyvicon_get_segment_global_rotation_euler_xyz(PyObject* self, PyObject* args) {
         PyObject* capsule;
@@ -441,6 +427,21 @@ extern "C" {
             Py_RETURN_NONE;
         }
         return Py_BuildValue("ddd", out.Rotation[0], out.Rotation[1], out.Rotation[2]);
+    }
+
+    static PyObject* pyvicon_get_segment_global_quaternion(PyObject* self, PyObject* args){
+        PyObject* capsule;
+        char* subject_name;
+        char* segment_name;
+        if (!PyArg_ParseTuple(args, "Oss", &capsule, &subject_name, &segment_name)) return NULL;
+        Client* client = (Client*)PyCapsule_GetPointer(capsule, "pyvicon.client");
+
+        // Watch out with Vicon's custom string memory management!!!!
+        Output_GetSegmentGlobalRotationQuaternion out = client->GetSegmentGlobalRotationQuaternion(subject_name, segment_name);
+        if(out.Result != Result::Success || out.Occluded){
+            Py_RETURN_NONE;
+        }
+        return Py_BuildValue("dddd", out.Rotation[3], out.Rotation[0], out.Rotation[1], out.Rotation[2]);
     }
 
     // Output_GetSegmentLocalTranslation GetSegmentLocalTranslation( const String & SubjectName, const String & SegmentName ) const;
@@ -645,6 +646,7 @@ extern "C" {
          {"pyvicon_get_subject_root_segment_name", pyvicon_get_subject_root_segment_name, METH_VARARGS, "Return root segment name"},
          {"pyvicon_get_segment_global_translation", pyvicon_get_segment_global_translation, METH_VARARGS, "Return segment global translation"},
          {"pyvicon_get_segment_global_rotation_matrix", pyvicon_get_segment_global_rotation_matrix, METH_VARARGS, "Return segment global rotation matrix"},
+         {"pyvicon_get_segment_global_rotation_euler_xyz", pyvicon_get_segment_global_rotation_euler_xyz, METH_VARARGS, "Return segment global rotation Euler XYZ"},
          {"pyvicon_get_segment_global_quaternion", pyvicon_get_segment_global_quaternion, METH_VARARGS, "Return segment global quaternion"},
          {"pyvicon_get_object_quality", pyvicon_get_object_quality, METH_VARARGS, "Return the quality score of a specified subject"},
          {"pyvicon_get_marker_count", pyvicon_get_marker_count, METH_VARARGS, "Return the number of markers for a specified subject"},
