@@ -179,6 +179,12 @@ class PyVicon:
             return None
         return np.array(quaternion)
 
+    def get_segment_global_rotation_euler_xyz(self, subject_name, segment_name):
+        euler_xyz = pyvicon_module.pyvicon_get_segment_global_rotation_euler_xyz(self.client_, subject_name, segment_name)
+        if euler_xyz is None:
+            return None
+        return np.array(euler_xyz)
+
     def get_subject_quality(self, name):
         return pyvicon_module.pyvicon_get_object_quality(self.client_, name)
 
